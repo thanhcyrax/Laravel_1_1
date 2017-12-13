@@ -1,0 +1,151 @@
+//BASIC
+  config->app.php
+  'debug' => env('APP_DEBUG', true), //thay thế thành true để bật lỗi
+
+//ROUTING
+	Route::get('/view', function () { //cơ bản
+		//echo 'Hello';
+		$ten = 'kaka';
+		return view('welcome' ,compact('ten'));// return ra trực típ view và có truyền biến
+	});
+
+	Route::get('/view', 'NameController@NameFunction'); //sử dụng controller kế bên function
+	Route::get('view1/{mon_hoc?}',function($mon_hoc='kkk'){ // truyền gt mặc định ko có cũng được
+		return $mon_hoc;
+	});
+	Route::get('view/{mon_hoc}/{tt}',function($mon_hoc ,$tt){ // truyền trên route
+		return $mon_hoc.'/'.$tt;
+	});
+	Route::get('view/{mon_hoc}/{tt}',function($mon_hoc ,$tt){ // truyền trên route
+		return $mon_hoc.'/'.$tt;
+	})->where(['mon_hoc'=>'']);
+	
+	Route::get('user/{id}/{name}', function ($id, $name) { //ràng buộc biến trên route
+		return 'okok';
+	})
+	->where(['id' => '[0-9]+', 'name' => '[a-z]+']);
+	Route::get('user', ['as'=>'us' ,function(){ //tạo định danh riêng cho url 
+	    return 'okok';
+	}]);//trong con troller gọi "return redirect()->route('us');"
+	Route::group(['prefix'=>'admin'],function(){//group gt các url trong group
+		Route::get('ad1',function(){
+			return 'ad1';
+		});
+		Route::get('ad2',function(){ 
+			return 'ad2';
+		});
+	});
+	Route::get('url/full' ,function(){ //lấy url hiện tại đang xài
+		return URL::full();
+	});
+	
+	Route::get('url/full' ,function(){ //lấy url tại thư mục gốc và gán thêm đuôi
+		return URL::asset();
+	});
+	
+	Route::get('to' ,function(){ //lấy url tại thư mục gốc và gán thêm đuôi
+		return URL::to('thong-tin',['thanh','01222222']);
+	});
+	
+	Route::get('to' ,function(){
+		return secure_url('thong-tin',['thanh','01222222']);//lấy url tại thư mục gốc và gán thêm đuôi nhưng xài cho link https
+	});
+
+//VIEW
+
+    fordel resources->views->ten_view.blade.php //tên đường dẫn vào view (thưc mục gốc)
+	render view('fordel1.fordel2.file');//fordel1->fordel2->file.blade.php
+	note: search view share Laravel để tìm cách gán biến cho tất cả các view
+	note: search view composer Laravel để tìm cách gán biến cho các view đã được chỉ định
+	view()->exists('welcome') //KT view có tồn tại hay ko ra true or false
+	
+//VIEW blade (ten_file.blade.php)
+    //layout cha
+	@yield('noi_dung') //phần sẽ inclu vào từ layout con
+	@yield('title')
+	@section('sidebar') //phần iclu từ layout con vẫn giữ gt trong thẻ và cho chồng thêm
+        This is the master sidebar.
+    @show
+	
+	//layout con
+	@extends('master')//kế thừa từ layout cha tên là 'master.blade.php'
+	@section('title','Master111') //gán giá trị cho biến mức đơn giản 
+	@section('noi_dung') //gán giá trị cho biến mức iclu view
+		<h1>wasaaa</h1>
+	@stop
+
+	@section('sidebar')
+		@parent // muốn kế thừa phần 'section('sidebar')' ở trên thì thêm biến này vào
+		This is the master sidebar.
+	@stop
+	
+	{{ '<b>Show</b>' }} :show lun giá trị có html
+	{!! '<b>Show</b>' !!} :ko show gt html
+	
+	@if() //cách viết toán tử đơn giản trong view
+	@endif
+	@for()
+	@endfor
+	{!! $name or 'tao' !!}//KT isset nếu ko có show ra 'tao'
+	@include('nhung') //inclu vào view 
+	@include('nhung', ['some' => 'data Lar']) //inclu vào view kèm biến 'some'
+	
+	{{-- asdaaaa --}} //ghi chú hoặc ko muốn show ra các giá trị ko muốn
+	
+//VIEW URL
+    
+	các file js ,css để trong folder public -> ten.js or public -> ten.css
+	<link rel="stylesheet" type="text/css" href="{{ asset('public/hh.css') }}"> //inclu đường dẫn từ thư mục gốc
+    <link rel="stylesheet" type="text/css" href="{{ asset('public/hh.css' ,true) }}"> //thêm true nếu link là https
+	
+//SCO = Shift + chuột phải -> ‘Opne command window here’
+//DB
+	**connection DB** 
+	Tìm file ‘.env.example’ rồi xóa đuôi ‘.example’ đi nếu đã có file ‘.env’ r thì xóa luôn 
+	Fix lại DB trong file ‘.env’ như VD
+	/*
+		DB_CONNECTION=mysql 
+		DB_HOST=localhost //tên host
+		DB_PORT=3306
+		DB_DATABASE=project_laravel //tên DB
+		DB_USERNAME=root //username
+		DB_PASSWORD= //pass
+	*/
+	Vào config->database.php truyền thông số DB như VD trên
+	Lưu ý phần ‘'default' => env('DB_CONNECTION', 'mysql'),’ là lựa chọn kiểu DB truyền ‘mySql’ 
+	SCO gõ ‘php artisan migrate’ để xem kết nói DB có chuẩn hay chưa
+	Nếu ko nữa chừng bị lỗi SCO gõ ’php artisan config:clear’ xong chạy lại 
+	Nếu thành công sẽ tạo ra các table trong DB
+
+	Nếu ko được thử cách sau 
+	Trước khi KT kết nối ta tìm file AppServiceProvider.php sửa code thành
+	/*
+	use Illuminate\Support\Facades\Schema;thêm vào
+	public function boot()
+	{
+		Schema::defaultStringLength(191);//thêm vào
+	}*/
+	
+	Note: Search 'Schema Laravel' hoặc 'Schema Laravel KhoaPham' để tìm cách viết và chỉnh sửa table bằng code  
+    Note: Search 'Migration Laravel' hoặc 'Migration Laravel KhoaPham' để tìm cách viết và chỉnh sửa table bằng code nhưng viết trong 1 class theo qui định
+//Model
+Model để trong fordel App->ten_model.php
+    
+	Vào folder database->seeds->DatabaseSeeder.php viết vào function run để test db ('seeding laravel')
+	VD:
+    /*
+		public function run()
+		{
+			DB::table('test_db')->insert([
+				'gia' => str_random(10),
+				'ten' => str_random(10).'@gmail.com',
+				'ghi_chu' => 'aaa',
+			]);
+		}
+	*/
+    xong gõ lệnh chạy SCO: 'php artisan db:seed' để chạy function run or 'php artisan db:seed --class=UserTableSeeder' với 'UserTableSeeder' tên class mà ta tạo
+
+//Route
+
+
+
