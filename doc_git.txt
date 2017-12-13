@@ -1,0 +1,19 @@
+git clone link //để tải file từ trên web về 
+
+folder gốc shift + chuột phải + 'git pash here' để viết lênh
+    'git status' //để xem thông báo
+	
+	'git add tên_file'// để add file mới tạo mà git chưa theo dõi
+	'git add *'// để add hết các file
+	'git commit -m"laravel 1 1 moi"' //để xác nhận các file vừa add kèm them comment "laravel 1 1 moi"
+	'git push' //tải lên để đồng bộ hóa với github online
+	Note: các lệnh trên lun đi với nhau
+	
+    'git pull' //để cập nhật lại project
+
+****** quay trở lại dữ liệu trước những lần push ******
+	
+	'git log' //lấy id những lần commit gõ xong nhớ ấn 'Ctr + c' để có thể gõ tiếp
+	'git revert id_ở_trên'// xong chạy rồi ấn 'Esc + : + q' để có thể gõ tiếp
+    'git status'// để kt lại commit thành công chưa
+	nếu ok thì gõ tip 'git push'
