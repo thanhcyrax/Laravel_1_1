@@ -145,7 +145,7 @@ Model để trong fordel App->ten_model.php
 	*/
     xong gõ lệnh chạy SCO: 'php artisan db:seed' để chạy function run or 'php artisan db:seed --class=UserTableSeeder' với 'UserTableSeeder' tên class mà ta tạo
 
-    dddddd
+asdasdasdasaasdasasd
 
 
 
