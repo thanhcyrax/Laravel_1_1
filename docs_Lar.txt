@@ -10,6 +10,7 @@
 	});
 
 	Route::get('/view', 'NameController@NameFunction'); //sử dụng controller kế bên function
+	
 	Route::get('view1/{mon_hoc?}',function($mon_hoc='kkk'){ // truyền gt mặc định ko có cũng được
 		return $mon_hoc;
 	});
@@ -99,6 +100,7 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('public/hh.css' ,true) }}"> //thêm true nếu link là https
 	
 //SCO = Shift + chuột phải -> ‘Opne command window here’
+
 //DB
 	**connection DB** 
 	Tìm file ‘.env.example’ rồi xóa đuôi ‘.example’ đi nếu đã có file ‘.env’ r thì xóa luôn 
@@ -144,8 +146,136 @@ Model để trong fordel App->ten_model.php
 		}
 	*/
     xong gõ lệnh chạy SCO: 'php artisan db:seed' để chạy function run or 'php artisan db:seed --class=UserTableSeeder' với 'UserTableSeeder' tên class mà ta tạo
+  
+    'php artisan make:model User' //cách tạo model tên User
+	Sau khi tạo xong nó sẽ xuất hiện trong Folder App->Ten_model.php
+	Ta thêm các dòng lệnh này trong class  
+	/*
+		protected $table = 'test_db'; //tên table muốn gán vào
+		public $timestamps = false; //có 2 cột date ta thêm vào để tránh truy xuất nó
+		protected $fillable = ['ten','gia','ghi_chu']; //các cột mà ta muốn truy cập
+		protected $hidden = ['id'];  //các cột mà ta muốn ẩn đi
+	*/
+	
+	<!-- Cấu trúc khi gọi model -->
+	App\TenModel::all(); // truy xuất tất cả theo kiểu object
+	App\TenModel::all()->toArray(); //kiểu mảng 
+	App\TenModel::all()->tojSon(); //kiểu mảng 
+	App\TenModel::all()->first(); //ra giá trị đầu tiên
+	App\TenModel::all()->last(); //ra giá trị cuối cùng
+	App\TenModel::all()->count();
+	App\TenModel::find(id); //chỉ truyền được id vào để truy xuất nếu ko có ra Null
+	App\TenModel::findOrFail(id);  //chỉ truyền được id vào để truy xuất ko có thì bào lỗi
+	
+	//khi where có thể truyền bình thường như các câu truy vấn và '->select()' nên truyền trước '->get()' và phải thêm '->get()'
+	App\TenModel::where('id',1)->get(); //như trên nhưng truy vấn thêm where
+	App\TenModel::where('id',1)->get()->toArray(); //ép kiểu
+	App\TenModel::where('id',1)->take(2)->get()->toArray(); //lấy ra 2 dòng dữ liệu
+	App\TenModel::whereRaw('id = ? and price = ?',[3,1000])->get(); //truyền truy vấn vào where
+	
+	//Save
+	$flight = new Flight;
+	$flight->name = 'ten';
+	$flight->save();
+	Hoặc
+	$flight = App\Flight::create(['name' => 'Flight 10' ,'cate_id' => '10']);
+	
+	//UPDATE
+	$flight = App\Flight::find(id); //truyền id vào
+	$flight->name = 'New Flight Name';
+	$flight->save();
+	
+	//DELETE
+	$cate = Cate::find($id);
+	$cate->delete($id);//truyền biến
+	Hoặc
+	App\Flight::destroy(id); //truyền id
+	Hoặc
+	$deletedRows = App\Flight::where('active', 0)->delete(); //truyền theo where
+	//RELATIONSHIPS
+	VD về viết các function quan hệ và nên viết ở 2 model muốn liên kết với nhau
+	/*
+		public function cate(){//tên table cần quan hệ
+			return $this->belongTo('App\Cate');//tạo quan hệ ở mức con với 1 cha
+		}
+		public function product(){//tên table cần quan hệ
+			return $this->hasMany('App\Product');//tạo quan hệ ở mức cha với nhiều con
+		}
+		public function roles()
+		{
+			return $this->belongsToMany('App\Role' ,'car_color'); //tạo quan hệ ở mức con với 1 or nhiều cha với table 'role' và 'car_color'
+		}
+	*/
+	//sau khi tạo quan hệ có thể viết theo kiểu này để truy xuất table quan hệ	
+	$flight = App\Flight::find(id)->cate()->get()->toArray(); //cate() : tên function quan hệ đã tạo trong model
+	
+//Query
+    <!-- Các lệnh này sẽ cho ra kiểu object -->
+    $db = DB::table('product')->get();//lấy hết dữ liệu
+	$db = DB::table('product')->select('name')->get();//lấy hết dữ liệu kèm lệnh select
+	
+	//lấy hết dữ liệu kèm lệnh where nếu ko có ra mảng rỗng
+	$db = DB::table('product')->select('name')->where('na',33)->get(); //mặc định where là '=' where('id',33)
+	$db = DB::table('product')->select('name')->where('id','=',33)->orWhere('id',34)->get(); //VD về thêm dấu where('id','=',33)
+	$db = DB::table('product')->select('name')->where('name','=',"'qqq'")->where('alias','=',"'qqq'")->get(); // where name = 'qqq' and alias = 'qqq'
+    $db = DB::table('product')->whereIn('id', [1, 2, 3])->get(); //ra các phần tử có trong mảng
+	$db = DB::table('product')->whereNotIn('id', [1, 2, 3])->get(); //ra các phần tử ko có trong mảng
 
-asdasdasdasaasdasasd
+	$db = DB::table('product')->whereBetween('id', [33, 36])->get();//id >= 33 and id <= 36
+	$db = DB::table('product')->whereNotBetween('id', [33, 36])->get();//id <= 33 and id >= 36
+	$db = DB::table('product')->whereNull('updated_at')->get();
+	$db = DB::table('product')->whereNotNull('updated_at')->get();
+	
+	$db = DB::table('product')->count(); //đếm giá trị
+	$db = DB::table('product')->max('id'); //ra giá trị của cột lớn nhất
+	$db = DB::table('product')->min('id'); //ra giá trị của cột thấp nhất
+	$db = DB::table('product')->where('id', 1)->avg('price');//ra giá trị trung bình của cột
+	$db = DB::table('product')->where('id', 1)->sum('price');//ra tổng giá trị của cột
+	
+	//JOIN
+	$db = DB::table('product')
+            ->select('product.*')
+            ->join('product_image', 'product.id', '=', 'product_image.product_id')
+            ->join('orders', 'users.id', '=', 'orders.user_id') //bỏ dòng này nếu join 1 bảng
+            ->get();
+    
+	//INSERT
+	DB::table('users')->insert([
+		['email' => 'taylor@example.com', 'votes' => 0],
+		['email' => 'dayle@example.com', 'votes' => 0]
+	]);
+	
+	$id = DB::table('users')->insertGetId( //insert 1 dòng dữ liệu để lấy giá trị id của chính dòng đó
+		['email' => 'john@example.com', 'votes' => 0]
+	);
+	
+	//UPDATE ra 1 nếu thành công
+	$db = DB::table('test_db')
+            ->where('id', 1)
+            ->update(['gia' => 100 ,'ghi_chu' => 'eee']);
+			
+	//DELETE
+	DB::table('users')->where('votes', '<', 100)->delete();
+	
+	//lấy hết dữ liệu kèm lệnh 'orderby' 
+	$db = DB::table('product')->select('name')->orderBy('id')->get();// mặc định orderBy('id') ,khác orderBy('id' ,'desc')
+    
+	//lấy hết dữ liệu kèm lệnh 'limit' 
+	$db = DB::table('product')->skip(10)->take(5)->get(); //lấy từ vị trí 10 và lấy 5 phần tử
 
-
-
+//FORM
+    //cách truyền dữ liệu từ form view sang con troller
+	Route::get('add',['as'=>'admin.cate.getAdd','uses'=>'CateController@getAdd']);//từ route để show ra view
+	Route::get('add',['as'=>'admin.cate.getAdd','uses'=>'CateController@getAdd']);//để submit gt kiểu 'post' về
+	<form action="{!! route('admin.cate.getAdd') !!}" method="POST"> //từ form
+	<input type='hidden' name='_token' value="{!! csrf_token() !!}"/> //tạo biến bảo mật 
+	
+	//cách submit form rồi xử lý dữ liệu(VD trong controller)
+	/*
+		public function postAdd(CateRequest $request){// lấy giá trị về
+			$cate = new Cate();//khởi tạo class
+			$cate->name = $request->txtCateName;//gán giá trị từng cột tương ứng input
+			$cate->save();//tiến hành save
+			return redirect()->route('admin.cate.getList');//điêu hướng trang sau khi save thành công
+		}
+    */
