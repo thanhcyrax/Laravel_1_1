@@ -51,7 +51,23 @@
 	Route::get('to' ,function(){
 		return secure_url('thong-tin',['thanh','01222222']);//lấy url tại thư mục gốc và gán thêm đuôi nhưng xài cho link https
 	});
-
+	
+	Route::any('{all?}' ,'NameController@NameFunction')->where('all','(.*)');//khi user vào link bậy bạ thì mặc định sẽ vào route này
+    
+	//cấu hình đường dẫn Restful Controller( ko phải API)
+	Route::resource('photo', 'PhotoController',
+                ['only' => ['index', 'create', 'edit']]);chỉ xài các 'controller' này để xử lý request api
+	
+	//Các kiểu 'controller' xử lý api 
+	GET	       /photo              || index  ||	photo.index
+	GET	       /photo/create       || create || photo.create
+	POST       /photo              || store  || photo.store
+	GET	       /photo/{photo}      || show   || photo.show
+	GET	       /photo/{photo}/edit || edit   || photo.edit
+	PUT/PATCH  /photo/{photo}      || update || photo.update
+	DELETE	   /photo/{photo}	   || destroy||	photo.destroy
+	{photo} //giá trị truyền trên url 
+    
 //VIEW
 
     fordel resources->views->ten_view.blade.php //tên đường dẫn vào view (thưc mục gốc)
@@ -266,7 +282,7 @@ Model để trong fordel App->ten_model.php
 //FORM
     //cách truyền dữ liệu từ form view sang con troller
 	Route::get('add',['as'=>'admin.cate.getAdd','uses'=>'CateController@getAdd']);//từ route để show ra view
-	Route::get('add',['as'=>'admin.cate.getAdd','uses'=>'CateController@getAdd']);//để submit gt kiểu 'post' về
+	Route::post('add',['as'=>'admin.cate.postAdd','uses'=>'CateController@postAdd']);//để submit gt kiểu 'post' về
 	<form action="{!! route('admin.cate.getAdd') !!}" method="POST"> //từ form
 	<input type='hidden' name='_token' value="{!! csrf_token() !!}"/> //tạo biến bảo mật 
 	
@@ -279,3 +295,146 @@ Model để trong fordel App->ten_model.php
 			return redirect()->route('admin.cate.getList');//điêu hướng trang sau khi save thành công
 		}
     */
+	
+	//KT dữ liệu đầu vào
+	Thêm dòng 'use Validator;' ngay trên đầu 'Controller'
+	Viết các giá trị sau trong function của 'Controller'
+	/*
+		$validator = Validator::make($request->all(), [
+			'txt_mon' => 'required|unique:ten_bang,ten_cot|max:255',
+			'txt_body' => 'required',
+			'txt_email' => 'email',
+		],
+		[
+			'txt_mon.required' => 'Không được để trống',
+			'txt_mon.unique' => 'Gía trị đã tồn tại',
+			'txt_body.required' => 'Không được để trống',
+			'txt_email.email' => 'Đây ko phải là email',
+		]
+		);
+		if($validator->fails()){ //KT lỗi
+			return redirect()->back->withErrors($validator->errors); //trở về ngay trang cũ và gán thêm gt cho biến báo lỗi
+		}
+	*/
+	Nhớ thêm 'Use Hash;' trên đầu 'controller'
+	Hash::make($str); //cách mã hóa kí tự như md5() của PHP
+	
+	//Tạo request
+	'php artisan make:request ten_request' nó sẽ tạo file mới trong fordel app->fordel http->ten_request.php
+	Viết cấu trúc sau trong file class vừa mới tạo
+	/*
+		public function rules()
+		{
+			return [
+				'slt_parent' => 'required',
+				'txtName' => 'required|unique:product,name',
+				'fImages' => 'required|image|max:150',//image: KT xem có phải hình hay ko và kích thước tối đa của hình
+
+			];
+		}
+		public function messages(){
+			return[
+				'slt_parent.required' => 'Please Choose Category',
+				'txtName.required' => 'Please Enter Name Product',//thông báo theo từng thuộc tính
+				'txtName.unique' => 'Product Name Is Exist',
+				'fImages.required' => 'Product Choose Images',
+				'fImages.image' => 'This File Is Not Images'
+			];
+		}
+	*/
+	Sau khi tạo thành công thêm dòng 'use App\Http\Requests\TenRequest;' vào 'controller' để sử dụng
+	Khi submit về 'controller' thì đổi thành
+	/*
+		public function postAdd(TenRequest $request){// lấy giá trị về
+			return redirect()->route('admin.cate.getList');//điêu hướng trang sau khi save thành công
+		}
+	*/
+	
+	//Upload File
+	Cách lấy request file về 
+	/*
+		public function postAdd(Request $request){
+			$file_name = $request->file('fImages')->getClientOriginalName();//lấy tên hình
+			$file_size = $request->file('fImages')->getSize();//lấy size hình(KB)
+			$product = new Product();
+			$product->img = $file_name;
+			$request->file('fImages')->move('resources/upload/',$file_name);//tải hình lên thư mục từ thư mục gốc đi vào
+		}
+	*/
+
+//ERRORS
+    CD về truyền thông báo lỗi đã thiết lập ở 'request' ,'Validator' ,'Validate'
+    <?php 
+        // xuất lỗi đã thiết lập ở request (TenRequest)
+        if(count($errors) > 0){?>
+            <div class='alert alert-danger'>
+                <ul>
+                    <?php foreach($errors->all() as $gt){?>
+                    <li><?php echo $gt;?></li>
+                    <?php }?>
+                </ul>
+            </div>
+    <?php }?>
+	{!! $errors->first('txt_tenbien') !!} //báo lỗi chính xác từng phần tử đã thiết lập ở 'controller' or 'request'
+
+//RESPONSES(mã hóa chuổi)
+    //VD về chuyển chuổi sang Json
+    $arr = array('qqq' => 'qqq','www' => 'www','eee' => 'eee');
+	Response::json($arr);
+	//VD về chuyển sang XML
+	$content = '<?xml version="1.0" encoding="UTF-8" ?>
+	<root></root>
+	';
+	$status = 200;
+	$value = 'text/xml';
+	return response($content, $status)->header('Content-Type', $value);
+	
+//REDIRECT(chuyển hướng trang)
+
+	return redirect('home/dashboard'); //truyền tên route đã tạo trước đó
+	hoặc
+	return redirect()->route('login')
+	return redirect()->back();//trở về trang cũ
+	
+	//truyền thêm dữ liệu ,nó sẽ mất khi f5 lại
+    return redirect('home/dashboard')->with(['level'=>'2' ,'message'=>'Success'1']);
+	Bên view sẽ show ra như sau
+	@if (session('level'))
+		<div class="alert alert-success">
+			{{ session('level') }}
+		</div>
+	@endif
+	Hoặc
+	<?php
+		if(Session::has('flash_message')){?>
+			<div class='alert alert-{!! Session::get("flash_level") !!}'>
+				{!! Session::get('flash_message') !!} 
+			</div>
+	<?php }?>
+	
+	//Tải file từ yêu cầu người dùng
+	$url = 'public/download/ten_file.img';
+	return response()->download($url)->deleteFileAfterSend(true);//tải xong xóa lun file đó
+
+//SERVICE PROVIDERS Note: search 'PROVIDERS laravel' để tìm hiểu
+
+//AUTHENTICATION ràng buộc login và logout
+    Phần đăng kí thì làm như phần save bình thường 
+	
+	//Phần login mặc định thì tài khoản là 'email' và mật khẩu là 'password' có thể chỉnh lại trong fordel config->auth.php
+	//Khi xài Auth ở 'controller' khác 'AuthController' ta sẽ thêm 'Use Auth;'
+	if (Auth::attempt(['email' => $email, 'password' => $password, 'lever' => $lever])){ //Kiểm tra TK ,MK và lever của user mà user login vào
+		echo Auth::user()->name; //tạo session nếu thành công 
+		echo $this->auth()->user()->name; //sử dụng cách này nếu cách trên ko được
+	}
+	if (Auth::check()){} //KT session trên có tồn tại hay không
+	
+	//Logout
+	Auth::logout();
+	
+	
+	
+	
+	
+	
+	
