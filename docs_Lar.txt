@@ -104,18 +104,40 @@
 	@for()
 	@endfor
 	{!! $name or 'tao' !!}//KT isset nếu ko có show ra 'tao'
-	@include('nhung') //inclu vào view 
-	@include('nhung', ['some' => 'data Lar']) //inclu vào view kèm biến 'some'
 	
-	{{-- asdaaaa --}} //ghi chú hoặc ko muốn show ra các giá trị ko muốn
+	{{-- ghi chu --}} //ghi chú hoặc ko muốn show ra các giá trị ko muốn
+	
+	
 	
 //VIEW URL
     
 	các file js ,css để trong folder public -> ten.js or public -> ten.css
 	<link rel="stylesheet" type="text/css" href="{{ asset('public/hh.css') }}"> //inclu đường dẫn từ thư mục gốc
     <link rel="stylesheet" type="text/css" href="{{ asset('public/hh.css' ,true) }}"> //thêm true nếu link là https
+	Hoặc
+	<link href="{{ url('public/hh.css') }}" rel="stylesheet">
+	<script src="{{ url('public/ckeditor.js') }}"></script>
+	//các link điều hướng khi xóa ,sửa
+	<a href="{!! URL::route('admin.cate.getDelete', $gt['id']) !!}">Edit</a>//bên view
+	Route::get('delete/{id}',['as'=>'admin.cate.getDelete','uses'=>'CateController@getDelete']);
 	
 //SCO = Shift + chuột phải -> ‘Opne command window here’
+
+//INCLU
+    //inclue trong view
+    @include('nhung') //inclu vào view 
+	@include('nhung', ['some' => 'data Lar']) //inclu vào view kèm biến 'some'
+	@include('admin.blocks.erros'); //truyền file từ resources->views->admin->blocks->erros.blade.php
+	 
+    //Thêm fucntion or class
+	Vào file ‘composer.json’ tìm ‘autoload’ thêm vào link file muốn add vào VD xem ở file ‘composer.json’ 
+	/*
+		"files": [
+			"app/KhoaPham/functions.php"//đường dẫn file
+		]
+	*/
+	Sau đó SCO gõ ‘php composer.phar dump-autoload’ để chạy lại dữ liệu(lưu ý phải có file composer.phar mới chạy được)
+    changeTitle($request->txtName); //lấy ra xài bt
 
 //DB
 	**connection DB** 
@@ -225,8 +247,13 @@ Model để trong fordel App->ten_model.php
 	//sau khi tạo quan hệ có thể viết theo kiểu này để truy xuất table quan hệ	
 	$flight = App\Flight::find(id)->cate()->get()->toArray(); //cate() : tên function quan hệ đã tạo trong model
 	
-//Query
+//QUERY
     <!-- Các lệnh này sẽ cho ra kiểu object -->
+	DB::select('select * from users where id = :id', ['id' => 1]); //viết query trực tiếp
+	DB::insert('insert into users (id, name) values (?, ?)', [1, 'Dayle']); //viết query trực tiếp
+	DB::update('update users set votes = 100 where name = ?', ['John']); //viết query trực tiếp
+	DB::delete('delete from users');
+	
     $db = DB::table('product')->get();//lấy hết dữ liệu
 	$db = DB::table('product')->select('name')->get();//lấy hết dữ liệu kèm lệnh select
 	
@@ -276,7 +303,7 @@ Model để trong fordel App->ten_model.php
 	//lấy hết dữ liệu kèm lệnh 'orderby' 
 	$db = DB::table('product')->select('name')->orderBy('id')->get();// mặc định orderBy('id') ,khác orderBy('id' ,'desc')
     
-	//lấy hết dữ liệu kèm lệnh 'limit' 
+	//lấy hết dữ liệu kèm lệnh 'limit'  
 	$db = DB::table('product')->skip(10)->take(5)->get(); //lấy từ vị trí 10 và lấy 5 phần tử
 
 //FORM
@@ -284,7 +311,10 @@ Model để trong fordel App->ten_model.php
 	Route::get('add',['as'=>'admin.cate.getAdd','uses'=>'CateController@getAdd']);//từ route để show ra view
 	Route::post('add',['as'=>'admin.cate.postAdd','uses'=>'CateController@postAdd']);//để submit gt kiểu 'post' về
 	<form action="{!! route('admin.cate.getAdd') !!}" method="POST"> //từ form
-	<input type='hidden' name='_token' value="{!! csrf_token() !!}"/> //tạo biến bảo mật 
+	Hoặc
+	<form action="{!! url('/admin/product/add') !!}" method="POST" enctype="multipart/form-data">
+	
+	<input type='hidden' name='_token' value="{!! csrf_token() !!}"/> //tạo biến bảo mật để ở trong form
 	
 	//cách submit form rồi xử lý dữ liệu(VD trong controller)
 	/*
