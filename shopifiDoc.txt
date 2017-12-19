@@ -1,0 +1,7 @@
+ngrok.io //tạo tên miền https
+php artisan serve
+
+shopify 
+luư ý CAUTH
+
+config Laravel
