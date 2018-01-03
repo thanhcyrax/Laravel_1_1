@@ -1,0 +1,126 @@
+$country =ServiceType::model()->findAll('st=:st',array(':st'=>1));
+
+onkeypress='return validatepricetable(event);'// ko cho nh?p ch?
+function validatepricetable(e) {
+    var keypressed = null;
+    if (window.event){
+        keypressed = window.event.keyCode;
+    }
+    else{ 
+        keypressed = e.which;
+    }
+    if ((keypressed < 48 || keypressed > 57)&&keypressed!=46){
+        if (keypressed == 8 || keypressed == 9){
+            return;
+        }
+        return false;
+    }
+}
+
+//show ?nh tr?c ti?p
+$(document).ready(function(){
+// LOAD IMAGE
+
+$('#btnUploadImg').on('change', function(evt) { //th? input file
+    var tgt = evt.target || window.event.srcElement,
+        files = tgt.files;
+
+    // FileReader support
+    if (FileReader && files && files.length) {
+        var fr = new FileReader();
+        fr.onload = function () {
+            document.getElementById('imgUpload').src = fr.result;//th? image
+        }
+        fr.readAsDataURL(files[0]);
+    }
+});
+nguyen luong tuyen
+sang 357 800 1200
+
+chieu 1 30 16 30
+
+toi thu 7 1700 2000
+
+doan diem thuy
+
+//làm tròn 2 ch? s?
+
+x =  total;
+var n = parseFloat(x); x = Math.round(n * 1000)/1000; //alert(x);
+
+//reponsive
+$(window).resize(function() {
+    var windowHeight =  $( window ).height();
+    var header       = $("#headerMenu").height();
+    var tab_menu     = $("#tabcontent .menuTabDetail").height();
+
+    $('#profileSideNav').height(windowHeight-header);
+
+    $('.statsTabContent').height(windowHeight-header-tab_menu-45);
+    
+    
+});
+$( document ).ready(function() {
+
+    var windowHeight =  $( window ).height();
+    var header       = $("#headerMenu").height();
+    var tab_menu     = $("#tabcontent .menuTabDetail").height();
+
+    $('#profileSideNav').height(windowHeight-header);
+
+    $('.statsTabContent').height(windowHeight-header-tab_menu-45);
+
+});
+
+hanh.nguyen@callnex.com
+lam@callnex.com
+
+	
+    
+// b? vào JS d? submit form 
+for ( instance in CKEDITOR.instances )
+            CKEDITOR.instances[instance].updateElement();
+//g?i mail co b?n
+$to = $_POST['Customer']['email']; 
+$subject = "Cty VietlinkGlobal";
+$message = $this->renderPartial('form_email_verification',array('code'=>$number), true);
+$header = "From:test.vietlinkglobal.com \r\n";
+$header .= "MIME-Version: 1.0\r\n";
+$header .= "Content-type: text/html\r\n";
+$retval = mail($to,$subject,$message,$header);
+
+//xuat mang
+var Orders = [];
+var weight;
+var length;
+var width;
+var height;
+
+$(".packed").each(function (e){
+var rowcart = [];
+weight  = $(this).find('.weight').val();rowcart.push(weight);
+length  = $(this).find('.length').val();rowcart.push(length);
+width   = $(this).find('.width').val();rowcart.push(width);
+height  = $(this).find('.height').val();rowcart.push(height);
+Orders.push(rowcart); 
+});
+var arr = JSON.stringify(Orders);
+
+rgba(6, 6, 6, 0.62)
+
+_ Some of my projects:
+   + Project cargo from the US to VN - VietLinkGlobal.
+   + Karaoke project of Korea - Magicsing
+   + American electronic components project - Aipacinc.
+
+_ Web programming - expert - 1 year.
+_ System Analysis and Design. 
+_ Building and developing the web of service ,e-commerce ,application...
+_ Building management systems as required.
+_ Object - Oriented Programming.
+_ Knowledgeable of business domain, invoicing (accounting) management...
+_ Independent or team work.
+
+AIzaSyDL7o-SeEEfc9rhZ65NWzgW2Wytj80A2pc
+
+
